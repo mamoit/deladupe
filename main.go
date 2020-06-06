@@ -22,41 +22,53 @@ type DedupFile struct {
 	parent *DedupDir
 }
 
-var hmap map[string] []DedupFile
+var hmap map[int64]map[string][]DedupFile
 
-func visit(path string, info os.FileInfo, err error) error {
+func visit_target(path string, info os.FileInfo, err error) error {
 	if err != nil {
 		log.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
 		return err
 	}
+
+	// Do not look into symlinks
 	if info.Mode() & os.ModeSymlink != 0 {
-		//log.Printf("Not evaluating symlinks")
 		return nil
-	} else if info.IsDir() {
-		//fmt.Printf("D: %q\n", path)	
-	} else {
-		f, err := os.Open(path)
-		if err != nil {
-			log.Print(err)
-			return nil
-		}
-		defer f.Close()
-		h := sha256.New()
-		if _, err := io.Copy(h, f); err != nil {
-			log.Print(err)
-		}
-		//fmt.Printf("F: %d %x %q\n", info.Size(), h.Sum(nil), path)
-		hash := hex.EncodeToString(h.Sum(nil))
-		hmap[hash] = append(hmap[hash], DedupFile{hash, path, nil})
 	}
+
+	// do not look into directories
+	if info.IsDir() {
+		return nil
+	}
+
+	// open file
+	f, err := os.Open(path)
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
+	defer f.Close()
+
+	// calculate sha256
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		log.Print(err)
+	}
+	hash := hex.EncodeToString(h.Sum(nil))
+
+	_, ok := hmap[info.Size()]
+	if !ok {
+		hmap[info.Size()] = make(map[string][]DedupFile)
+	}
+	hmap[info.Size()][hash] = append(hmap[info.Size()][hash], DedupFile{hash, path, nil})
+
 	return nil
 }
 
 func main() {
-	hmap = make(map[string] []DedupFile)
+	hmap = make(map[int64]map[string] []DedupFile)
 
 	path := os.Args[1]
-	err := filepath.Walk(path, visit)
+	err := filepath.Walk(path, visit_target)
 	if err != nil {
 		fmt.Printf("error walking the path %q: %v\n", path, err)
 		return
@@ -64,9 +76,9 @@ func main() {
 
 	hmap1 := hmap
 
-	hmap = make(map[string] []DedupFile)
+	hmap = make(map[int64]map[string] []DedupFile)
 	path = os.Args[2]
-	err = filepath.Walk(path, visit)
+	err = filepath.Walk(path, visit_target)
 	if err != nil {
 		fmt.Printf("error walking the path %q: %v\n", path, err)
 		return
@@ -74,11 +86,18 @@ func main() {
 
 	hmap2 := hmap
 
-	for k, v := range hmap1 {
-		_, ok := hmap2[k]
-		if ok {
-			for f := range hmap1[k] {
-				fmt.Println(v[f].path, "exists")
+	for size, hashes := range hmap1 {
+		_, ok := hmap2[size]
+		if !ok {
+			continue
+		}
+		for hash, files := range hashes {
+			_, ok := hmap2[size][hash]
+			if !ok {
+				continue
+			}
+			for file := range files {
+				fmt.Println(files[file].path, "exists")
 			}
 		}
 	}

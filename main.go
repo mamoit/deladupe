@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"io"
+	"strconv"
 	"path/filepath"
 	"crypto/sha256"
 	"encoding/hex"
@@ -23,6 +24,7 @@ type DedupFile struct {
 }
 
 var hmap map[int64]map[string][]DedupFile
+var min_size uint64
 
 func visit_target(path string, info os.FileInfo, err error) error {
 	if err != nil {
@@ -33,6 +35,11 @@ func visit_target(path string, info os.FileInfo, err error) error {
 	// Do not look into symlinks
 	// Do not look into directories
 	if info.Mode() & (os.ModeSymlink | os.ModeDir) != 0 {
+		return nil
+	}
+
+	// check if file is too small
+	if uint64(info.Size()) < min_size {
 		return nil
 	}
 
@@ -72,6 +79,11 @@ func visit_source(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
+	// check if file is too small
+	if uint64(info.Size()) < min_size {
+		return nil
+	}
+
 	// stop if there is no file with the same size
 	size := info.Size()
 	_, ok := hmap[size]
@@ -106,6 +118,11 @@ func visit_source(path string, info os.FileInfo, err error) error {
 
 func main() {
 	hmap = make(map[int64]map[string] []DedupFile)
+
+	min_size = 0
+	if len(os.Args) >= 4 {
+		min_size, _ = strconv.ParseUint(os.Args[3], 10, 64)
+	}
 
 	path := os.Args[2]
 	err := filepath.Walk(path, visit_target)

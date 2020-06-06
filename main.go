@@ -31,12 +31,8 @@ func visit_target(path string, info os.FileInfo, err error) error {
 	}
 
 	// Do not look into symlinks
-	if info.Mode() & os.ModeSymlink != 0 {
-		return nil
-	}
-
-	// do not look into directories
-	if info.IsDir() {
+	// Do not look into directories
+	if info.Mode() & (os.ModeSymlink | os.ModeDir) != 0 {
 		return nil
 	}
 
@@ -71,17 +67,13 @@ func visit_source(path string, info os.FileInfo, err error) error {
 	}
 
 	// Do not look into symlinks
-	if info.Mode() & os.ModeSymlink != 0 {
-		return nil
-	}
-
 	// do not look into directories
-	if info.IsDir() {
+	if info.Mode() & (os.ModeSymlink | os.ModeDir) != 0 {
 		return nil
 	}
 
+	// stop if there is no file with the same size
 	size := info.Size()
-
 	_, ok := hmap[size]
 	if !ok {
 		return nil

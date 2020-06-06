@@ -1,25 +1,25 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"log"
-	"io"
-	"strconv"
-	"path/filepath"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"path/filepath"
+	"strconv"
 )
 
 type DedupDir struct {
-	parent *DedupDir
+	parent   *DedupDir
 	children []*DedupDir
-	files []*DedupFile
+	files    []*DedupFile
 }
 
 type DedupFile struct {
-	hash string
-	path string
+	hash   string
+	path   string
 	parent *DedupDir
 }
 
@@ -34,7 +34,7 @@ func visit_target(path string, info os.FileInfo, err error) error {
 
 	// Do not look into symlinks
 	// Do not look into directories
-	if info.Mode() & (os.ModeSymlink | os.ModeDir) != 0 {
+	if info.Mode()&(os.ModeSymlink|os.ModeDir) != 0 {
 		return nil
 	}
 
@@ -75,7 +75,7 @@ func visit_source(path string, info os.FileInfo, err error) error {
 
 	// Do not look into symlinks
 	// do not look into directories
-	if info.Mode() & (os.ModeSymlink | os.ModeDir) != 0 {
+	if info.Mode()&(os.ModeSymlink|os.ModeDir) != 0 {
 		return nil
 	}
 
@@ -117,7 +117,7 @@ func visit_source(path string, info os.FileInfo, err error) error {
 }
 
 func main() {
-	hmap = make(map[int64]map[string] []DedupFile)
+	hmap = make(map[int64]map[string][]DedupFile)
 
 	min_size = 0
 	if len(os.Args) >= 4 {

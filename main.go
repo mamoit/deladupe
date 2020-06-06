@@ -104,7 +104,10 @@ func visit_source(path string, info os.FileInfo, err error) error {
 
 	_, ok = hmap[size][hash]
 	if ok {
-		fmt.Println(path, "exists")
+		fmt.Println(size, path)
+		for file := range hmap[size][hash] {
+			fmt.Println("- ", hmap[size][hash][file].path)
+		}
 	}
 	return nil
 }

@@ -58,7 +58,7 @@ func NewDeduper(minSize uint64) *Deduper {
 func (d *Deduper) trackDedupFile(size int64, hash string, file DedupFile) {
 	_, ok := d.hmap.filesBySize[size]
 	if !ok {
-		h := &hashes{filesByHash:make(map[string][]DedupFile)}
+		h := &hashes{filesByHash: make(map[string][]DedupFile)}
 		d.hmap.filesBySize[size] = h
 	}
 	defupFileList := d.hmap.filesBySize[size].filesByHash[hash]
@@ -66,7 +66,7 @@ func (d *Deduper) trackDedupFile(size int64, hash string, file DedupFile) {
 }
 
 func (d *Deduper) getDedupFiles(size int64, hash string) []DedupFile {
-	files , ok := d.hmap.filesBySize[size].filesByHash[hash]
+	files, ok := d.hmap.filesBySize[size].filesByHash[hash]
 	if !ok {
 		return nil
 	}
@@ -103,8 +103,8 @@ func (d *Deduper) visitTarget(path string, info os.FileInfo, err error) error {
 	}
 
 	dedup := DedupFile{
-		hash:   hash,
-		path:   path,
+		hash: hash,
+		path: path,
 	}
 	d.trackDedupFile(info.Size(), hash, dedup)
 

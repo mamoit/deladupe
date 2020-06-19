@@ -136,9 +136,13 @@ func (d *Deduper) visitSource(path string, info os.FileInfo, err error) error {
 
 	files := d.getDedupFiles(size, hash)
 	if files != nil {
-		fmt.Println(size, path)
+		fmt.Println("#", size, hash)
+		fmt.Println("-", path)
+		// os.Remove(path)
+		// TODO Do not delete if file path is the same
+		// TODO handle failed deletion (no delete permission for eg)
 		for file := range files {
-			fmt.Println("- ", files[file].path)
+			fmt.Println("+", files[file].path)
 		}
 	}
 	return nil
@@ -148,9 +152,13 @@ func main() {
 	var minSize uint64
 	if len(os.Args) >= 4 {
 		minSize, _ = strconv.ParseUint(os.Args[3], 10, 64)
+	} else {
+		// Do not delete 0 sized files by default
+		minSize = 1
 	}
 	deduper := NewDeduper(minSize)
 
+	fmt.Println("Scanning target directory", os.Args[2])
 	path := os.Args[2]
 	err := filepath.Walk(path, deduper.visitTarget)
 	if err != nil {
@@ -158,6 +166,7 @@ func main() {
 		return
 	}
 
+	fmt.Println("Scanning origin directory", os.Args[1])
 	path = os.Args[1]
 	err = filepath.Walk(path, deduper.visitSource)
 	if err != nil {

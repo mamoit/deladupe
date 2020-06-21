@@ -8,7 +8,7 @@ import (
 func main() {
 	initFlags()
 
-	if len(keepDirs) == 0 && len(purgeDirs) == 0 {
+	if len(keepDirs) + len(purgeDirs) == 0 {
 		fmt.Println("No path specified")
 		return
 	}

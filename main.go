@@ -20,7 +20,7 @@ func main() {
 
 		fmt.Println("Scanning keep directory", path)
 
-		err := filepath.Walk(path, deduper.visit)
+		err := filepath.Walk(path, deduper.visitKeep)
 		if err != nil {
 			fmt.Printf("error walking the path %q: %v\n", path, err)
 			return
@@ -32,7 +32,7 @@ func main() {
 
 		fmt.Println("Scanning purge directory", path)
 
-		err := filepath.Walk(path, deduper.visit)
+		err := filepath.Walk(path, deduper.visitPurge)
 		if err != nil {
 			fmt.Printf("error walking the path %q: %v\n", path, err)
 			return

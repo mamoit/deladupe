@@ -43,7 +43,15 @@ func (d *Deduper) shouldVisit(info os.FileInfo) bool {
 	return true
 }
 
-func (d *Deduper) visit(path string, info os.FileInfo, err error) error {
+func (d *Deduper) visitKeep(path string, info os.FileInfo, err error) error {
+	return d.visit(path, info, err, false)
+}
+
+func (d *Deduper) visitPurge(path string, info os.FileInfo, err error) error {
+	return d.visit(path, info, err, true)
+}
+
+func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) error {
 	if err != nil {
 		log.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
 		return err
@@ -104,14 +112,16 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error) error {
 	// TODO bitwise comparison between both files?
 	// Clashes using sha256 with the same sized file are be quite improbable though...
 
-	// Delete the new one if it is targeted for deletion
-	fmt.Println("#", size, hash)
-	fmt.Println("-", path)
-	if delete {
-		//os.Remove(path)
+	if purge {
+		// Delete the new one if it is targeted for deletion
+		fmt.Println("#", size, hash)
+		fmt.Println("-", path)
+		if delete {
+			//os.Remove(path)
+		}
+		// TODO Do not delete if file path is the same
+		// TODO handle failed deletion (no delete permission for eg)
 	}
-	// TODO Do not delete if file path is the same
-	// TODO handle failed deletion (no delete permission for eg)
 
 	return nil
 }

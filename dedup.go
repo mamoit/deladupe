@@ -8,13 +8,13 @@ import (
 )
 
 type Deduper struct {
-	lock sync.Mutex
+	mux sync.Mutex
 
 	filesBySize map[int64]*SameSized
 }
 
 type SameSized struct {
-	lock sync.Mutex
+	mux sync.Mutex
 
 	pending string
 
@@ -65,6 +65,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error) error {
 	}
 
 	size := info.Size()
+	d.mux.Lock()
 	_, ok := d.filesBySize[size]
 
 	// if there are no files with the same size
@@ -74,9 +75,13 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error) error {
 			pending:     path,
 			filesByHash: make(map[string][]string),
 		}
+		d.mux.Unlock()
 		return nil
 	}
+	d.mux.Unlock()
 
+	d.filesBySize[size].mux.Lock()
+	defer d.filesBySize[size].mux.Unlock()
 	// if there is a file with a pending hash, compute it
 	if d.filesBySize[size].pending != "" {
 		hash, err := computeHash(d.filesBySize[size].pending)

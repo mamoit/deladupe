@@ -21,24 +21,12 @@ type SameSized struct {
 	filesByHash map[string][]string
 }
 
-// type hashMap struct {
-// 	hashMap map[string][]DedupFile
-// }
-
 func NewDeduper() *Deduper {
 	filesBySize := make(map[int64]*SameSized)
 
 	return &Deduper{
 		filesBySize: filesBySize,
 	}
-}
-
-func (d *Deduper) getDedupFiles(size int64, hash string) []string {
-	files, ok := d.filesBySize[size].filesByHash[hash]
-	if !ok {
-		return nil
-	}
-	return files
 }
 
 func (d *Deduper) shouldVisit(info os.FileInfo) bool {
@@ -124,9 +112,6 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error) error {
 	}
 	// TODO Do not delete if file path is the same
 	// TODO handle failed deletion (no delete permission for eg)
-	// for file := range files {
-	// 	fmt.Println("+", files[file].path)
-	// }
 
 	return nil
 }

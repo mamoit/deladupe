@@ -15,7 +15,7 @@ func main() {
 
 	deduper := NewDeduper()
 
-	for keepI := range(keepDirs) {
+	for keepI := range keepDirs {
 		path := keepDirs[keepI]
 
 		fmt.Println("Scanning keep directory", path)
@@ -27,7 +27,7 @@ func main() {
 		}
 	}
 
-	for purgeI := range(purgeDirs) {
+	for purgeI := range purgeDirs {
 		path := purgeDirs[purgeI]
 
 		fmt.Println("Scanning purge directory", path)

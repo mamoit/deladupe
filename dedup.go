@@ -10,7 +10,7 @@ import (
 type Deduper struct {
 	lock sync.Mutex
 
-	filesBySize map[int64] *SameSized
+	filesBySize map[int64]*SameSized
 }
 
 type SameSized struct {
@@ -26,7 +26,7 @@ type SameSized struct {
 // }
 
 func NewDeduper() *Deduper {
-	filesBySize := make(map[int64] *SameSized)
+	filesBySize := make(map[int64]*SameSized)
 
 	return &Deduper{
 		filesBySize: filesBySize,
@@ -63,7 +63,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error) error {
 	if !d.shouldVisit(info) {
 		return nil
 	}
-	
+
 	size := info.Size()
 	_, ok := d.filesBySize[size]
 
@@ -71,12 +71,12 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error) error {
 	if !ok {
 		// Add path to the pending slot and carry on
 		d.filesBySize[size] = &SameSized{
-			pending: path,
+			pending:     path,
 			filesByHash: make(map[string][]string),
 		}
 		return nil
 	}
-	
+
 	// if there is a file with a pending hash, compute it
 	if d.filesBySize[size].pending != "" {
 		hash, err := computeHash(d.filesBySize[size].pending)

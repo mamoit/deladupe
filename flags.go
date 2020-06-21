@@ -23,10 +23,10 @@ var purgeDirs []string
 var minSize uint64
 
 func initFlags() {
-	flag.StringArrayVar(&keepDirs, "keep", nil, "Directories from where to keep all data.")
-	flag.StringArrayVar(&purgeDirs, "purge", nil, "Directories from where to purge duplicates.")
-	flag.Uint64Var(&minSize, "minSize", 1, "Minimum size of a file to be considered.")
-	flag.BoolVar(&delete, "delete", false, "Delete files.")
+	flag.StringArrayVarP(&keepDirs, "keep", "k", nil, "Directories from where to keep all data.")
+	flag.StringArrayVarP(&purgeDirs, "purge", "p", nil, "Directories from where to purge duplicates.")
+	flag.Uint64VarP(&minSize, "minSize", "s", 1, "Minimum size of a file to be considered.")
+	flag.BoolVarP(&delete, "delete", "d", false, "Delete files.")
 
 	flag.Parse()
 }

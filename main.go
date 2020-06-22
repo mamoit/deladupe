@@ -5,14 +5,7 @@ import (
 	"path/filepath"
 )
 
-func main() {
-	initFlags()
-
-	if len(keepDirs) + len(purgeDirs) == 0 {
-		fmt.Println("No path specified")
-		return
-	}
-
+func walk() {
 	deduper := NewDeduper()
 
 	// Look into directories to keep
@@ -40,4 +33,15 @@ func main() {
 			return
 		}
 	}
+}
+
+func main() {
+	initFlags()
+
+	if len(keepDirs)+len(purgeDirs) == 0 {
+		fmt.Println("No path specified")
+		return
+	}
+
+	walk()
 }

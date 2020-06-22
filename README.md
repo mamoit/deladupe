@@ -2,7 +2,7 @@
 
 *THIS IS NOT PRODUCTION READY, DO NOT USE THIS!*
 
-## Rational
+## Motivation
 I have a folder where I've thrown stuff into for a looooong time.
 It's full of cruft and duplicated data.
 Some of this data also lives in my current setup, which is well organized.
@@ -50,5 +50,3 @@ The objective is to eventually be able to comb through all the cruft that has be
 Or at least make it manageable.
 
 ## TODO
-* Only calculate hashes of a file in the target directory if one in the source directory is found with the exact same size.
-* Set a mutex per file size to allow for parallel operation

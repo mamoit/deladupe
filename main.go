@@ -15,6 +15,7 @@ func main() {
 
 	deduper := NewDeduper()
 
+	// Look into directories to keep
 	for keepI := range keepDirs {
 		path := keepDirs[keepI]
 
@@ -27,6 +28,7 @@ func main() {
 		}
 	}
 
+	// Look into directories to purge from duplicate files
 	for purgeI := range purgeDirs {
 		path := purgeDirs[purgeI]
 

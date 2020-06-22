@@ -21,6 +21,7 @@ type SameSized struct {
 	filesByHash map[string][]string
 }
 
+// Constructor for Deduper
 func NewDeduper() *Deduper {
 	filesBySize := make(map[int64]*SameSized)
 
@@ -29,6 +30,7 @@ func NewDeduper() *Deduper {
 	}
 }
 
+// Decide wether to visit a file or not
 func (d *Deduper) shouldVisit(info os.FileInfo) bool {
 	// Do not look into symlinks
 	// Do not look into directories
@@ -36,7 +38,7 @@ func (d *Deduper) shouldVisit(info os.FileInfo) bool {
 		return false
 	}
 
-	// check if file is too small
+	// Do not conside if file is too small
 	if uint64(info.Size()) < minSize {
 		return false
 	}
@@ -61,6 +63,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 	}
 
 	size := info.Size()
+
 	d.mux.Lock()
 	_, ok := d.filesBySize[size]
 
@@ -78,6 +81,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 
 	d.filesBySize[size].mux.Lock()
 	defer d.filesBySize[size].mux.Unlock()
+
 	// if there is a file with a pending hash, compute it
 	if d.filesBySize[size].pending != "" {
 		hash, err := computeHash(d.filesBySize[size].pending)
@@ -109,8 +113,9 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 	// Add this new one to the list
 	d.filesBySize[size].filesByHash[hash] = append(d.filesBySize[size].filesByHash[hash], path)
 
-	// TODO bitwise comparison between both files?
+	// TODO optional bitwise comparison between both files?
 	// Clashes using sha256 with the same sized file are be quite improbable though...
+	// Only for the trully paranoid
 
 	if purge {
 		// Delete the new one if it is targeted for deletion

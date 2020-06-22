@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-// Helper functions
+// Compute hash used for file comparison
 func computeHash(path string) (string, error) {
 	// open file
 	f, err := os.Open(path)

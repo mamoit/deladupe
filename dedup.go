@@ -122,7 +122,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 		fmt.Println("#", size, hash)
 		fmt.Println("-", path)
 		if delete {
-			//os.Remove(path)
+			os.Remove(path)
 		}
 		// TODO Do not delete if file path is the same
 		// TODO handle failed deletion (no delete permission for eg)

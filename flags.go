@@ -4,24 +4,14 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-type arrayStringFlags []string
-
-func (i *arrayStringFlags) String() string {
-	return "my string representation"
-}
-
-func (i *arrayStringFlags) Set(value string) error {
-	*i = append(*i, value)
-	return nil
-}
-
+// Global variables
 var delete bool
+var minSize uint64
 
 var keepDirs []string
 var purgeDirs []string
 
-var minSize uint64
-
+// Parse command line flags
 func initFlags() {
 	flag.StringArrayVarP(&keepDirs, "keep", "k", nil, "Directories from where to keep all data.")
 	flag.StringArrayVarP(&purgeDirs, "purge", "p", nil, "Directories from where to purge duplicates.")

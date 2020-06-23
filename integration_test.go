@@ -48,6 +48,8 @@ func TestSimple(t *testing.T) {
 	writeFile("tmp/purge2/hi", "hi")
 	writeFile("tmp/purge2/not-so-snowflake", "snowflake")
 
+	defer os.RemoveAll("tmp")
+
 	delete = true
 	minSize = 1
 	keepDirs = []string{"tmp/keep1", "tmp/keep2"}
@@ -64,7 +66,6 @@ func TestSimple(t *testing.T) {
 	if !exists("tmp/purge1/snowflake") {
 		t.Error("Unique purge file deleted")
 	}
-	os.RemoveAll("tmp")
 }
 
 func TestMinSize(t *testing.T) {
@@ -79,6 +80,8 @@ func TestMinSize(t *testing.T) {
 	os.MkdirAll("tmp/purge2/", 0750)
 	writeFile("tmp/purge2/zerobyte", "")
 	writeFile("tmp/purge2/onebyte", "1")
+
+	defer os.RemoveAll("tmp")
 
 	delete = true
 	minSize = 1
@@ -96,5 +99,28 @@ func TestMinSize(t *testing.T) {
 	if exists("tmp/purge2/onebyte") {
 		t.Error("Exactly min size purge file not deleted")
 	}
-	os.RemoveAll("tmp")
+}
+
+func TestDeleteFlag(t *testing.T) {
+	os.MkdirAll("tmp/keep", 0750)
+	writeFile("tmp/keep/hi", "hi")
+
+	os.MkdirAll("tmp/purge/", 0750)
+	writeFile("tmp/purge/hi", "hi")
+
+	defer os.RemoveAll("tmp")
+
+	delete = false
+	minSize = 1
+	keepDirs = []string{"tmp/keep"}
+	purgeDirs = []string{"tmp/purge"}
+
+	walk()
+
+	if !exists("tmp/keep/hi") {
+		t.Error("Keep file deleted")
+	}
+	if !exists("tmp/purge/hi") {
+		t.Error("File deleted with delete flag set to false")
+	}
 }

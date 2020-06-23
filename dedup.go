@@ -120,9 +120,11 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 	if purge {
 		// Delete the new one if it is targeted for deletion
 		fmt.Println("#", size, hash)
-		fmt.Println("-", path)
 		if delete {
+			fmt.Println("-", path)
 			os.Remove(path)
+		} else {
+			fmt.Println("~", path)
 		}
 		// TODO Do not delete if file path is the same
 		// TODO handle failed deletion (no delete permission for eg)

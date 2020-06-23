@@ -124,3 +124,31 @@ func TestDeleteFlag(t *testing.T) {
 		t.Error("File deleted with delete flag set to false")
 	}
 }
+
+func TestSameSizeDifferentHash(t *testing.T) {
+	os.MkdirAll("tmp/keep", 0750)
+	writeFile("tmp/keep/3bytes", "hya")
+
+	os.MkdirAll("tmp/purge/", 0750)
+	writeFile("tmp/purge/another-3bytes", "hya")
+	writeFile("tmp/purge/3bytes-but-different", "bye")
+
+	defer os.RemoveAll("tmp")
+
+	delete = true
+	minSize = 1
+	keepDirs = []string{"tmp/keep"}
+	purgeDirs = []string{"tmp/purge"}
+
+	walk()
+
+	if !exists("tmp/keep/3bytes") {
+		t.Error("Keep file deleted")
+	}
+	if !exists("tmp/purge/3bytes-but-different") {
+		t.Error("File deleted with same size and unique content")
+	}
+	if exists("tmp/purge/another-3bytes") {
+		t.Error("Duplicate purge file not deleted")
+	}
+}

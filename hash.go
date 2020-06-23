@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"os"
 )
@@ -13,7 +12,6 @@ func computeHash(path string) (string, error) {
 	// open file
 	f, err := os.Open(path)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 	defer f.Close()

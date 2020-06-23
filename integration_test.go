@@ -86,4 +86,6 @@ func TestSimple(t *testing.T) {
 	if exists("tmp/purge2/not-so-snowflake") {
 		t.Error("Duplicate purge file deleted")
 	}
+
+	os.RemoveAll("tmp")
 }

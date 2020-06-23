@@ -55,37 +55,14 @@ func TestSimple(t *testing.T) {
 
 	walk()
 
-	if !exists("tmp/keep1/a/hi") {
+	if !exists("tmp/keep1/a/hi") || !exists("tmp/keep1/hi") || !exists("tmp/keep2/a/hi") || !exists("tmp/keep2/hi") {
 		t.Error("Keep file deleted")
 	}
-	if !exists("tmp/keep1/hi") {
-		t.Error("Keep file deleted")
-	}
-	if !exists("tmp/keep2/a/hi") {
-		t.Error("Keep file deleted")
-	}
-	if !exists("tmp/keep2/hi") {
-		t.Error("Keep file deleted")
-	}
-	if exists("tmp/purge1/a/hi") {
+	if exists("tmp/purge1/a/hi") || exists("tmp/purge1/hi") || exists("tmp/purge2/a/hi") || exists("tmp/purge2/hi") || exists("tmp/purge2/not-so-snowflake") {
 		t.Error("Duplicate purge file not deleted")
 	}
-	if exists("tmp/purge1/hi") {
-		t.Error("Duplicate purge file not deleted")
-	}
-	if exists("tmp/purge2/a/hi") {
-		t.Error("Duplicate purge file not deleted")
-	}
-	if exists("tmp/purge2/hi") {
-		t.Error("Duplicate purge file not deleted")
-	}
-
 	if !exists("tmp/purge1/snowflake") {
 		t.Error("Unique purge file deleted")
 	}
-	if exists("tmp/purge2/not-so-snowflake") {
-		t.Error("Duplicate purge file deleted")
-	}
-
 	os.RemoveAll("tmp")
 }

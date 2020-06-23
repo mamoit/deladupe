@@ -48,5 +48,3 @@ I already ran fdupes in the messy directory, and that actually reduced the amoun
 No.
 The objective is to eventually be able to comb through all the cruft that has been accumulating in the source directory and get rid of it.
 Or at least make it manageable.
-
-## TODO

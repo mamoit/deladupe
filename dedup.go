@@ -113,10 +113,6 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 	// Add this new one to the list
 	d.filesBySize[size].filesByHash[hash] = append(d.filesBySize[size].filesByHash[hash], path)
 
-	// TODO optional bitwise comparison between both files?
-	// Clashes using sha256 with the same sized file are be quite improbable though...
-	// Only for the trully paranoid
-
 	if purge {
 		// Delete the new one if it is targeted for deletion
 		fmt.Println("#", size, hash)
@@ -126,8 +122,6 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 		} else {
 			fmt.Println("~", path)
 		}
-		// TODO Do not delete if file path is the same
-		// TODO handle failed deletion (no delete permission for eg)
 	}
 
 	return nil

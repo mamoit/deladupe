@@ -66,3 +66,35 @@ func TestSimple(t *testing.T) {
 	}
 	os.RemoveAll("tmp")
 }
+
+func TestMinSize(t *testing.T) {
+	os.MkdirAll("tmp/keep1", 0750)
+	writeFile("tmp/keep1/zerobyte", "")
+
+	os.MkdirAll("tmp/keep2/", 0750)
+	writeFile("tmp/keep2/onebyte", "1")
+
+	os.MkdirAll("tmp/purge1/", 0750)
+	writeFile("tmp/purge1/zerobyte", "")
+	os.MkdirAll("tmp/purge2/", 0750)
+	writeFile("tmp/purge2/zerobyte", "")
+	writeFile("tmp/purge2/onebyte", "1")
+
+	delete = true
+	minSize = 1
+	keepDirs = []string{"tmp/keep1", "tmp/keep2"}
+	purgeDirs = []string{"tmp/purge1", "tmp/purge2"}
+
+	walk()
+
+	if !exists("tmp/keep1/zerobyte") || !exists("tmp/keep2/onebyte") {
+		t.Error("Keep file deleted")
+	}
+	if !exists("tmp/purge1/zerobyte") || !exists("tmp/purge2/zerobyte") {
+		t.Error("Below min size purge file deleted")
+	}
+	if exists("tmp/purge2/onebyte") {
+		t.Error("Exactly min size purge file not deleted")
+	}
+	os.RemoveAll("tmp")
+}

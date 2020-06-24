@@ -130,7 +130,7 @@ func TestSameSizeDifferentHash(t *testing.T) {
 	writeFile("tmp/keep/3bytes", "hya")
 
 	os.MkdirAll("tmp/purge/", 0750)
-	writeFile("tmp/purge/another-3bytes", "hya")
+	writeFile("tmp/purge/3bytes", "hya")
 	writeFile("tmp/purge/3bytes-but-different", "bye")
 
 	defer os.RemoveAll("tmp")
@@ -148,7 +148,7 @@ func TestSameSizeDifferentHash(t *testing.T) {
 	if !exists("tmp/purge/3bytes-but-different") {
 		t.Error("File deleted with same size and unique content")
 	}
-	if exists("tmp/purge/another-3bytes") {
+	if exists("tmp/purge/3bytes") {
 		t.Error("Duplicate purge file not deleted")
 	}
 }

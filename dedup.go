@@ -109,19 +109,21 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 		return nil
 	}
 
+	fmt.Println("#", size, hash)
+	for otherI := range d.filesBySize[size].filesByHash[hash] {
+		fmt.Println("+", d.filesBySize[size].filesByHash[hash][otherI])
+	}
+
 	// There's already a file with the same hash.
 	// Add this new one to the list
 	d.filesBySize[size].filesByHash[hash] = append(d.filesBySize[size].filesByHash[hash], path)
 
-	if purge {
-		// Delete the new one if it is targeted for deletion
-		fmt.Println("#", size, hash)
-		if delete {
-			fmt.Println("-", path)
-			os.Remove(path)
-		} else {
-			fmt.Println("~", path)
-		}
+	// Delete the new one if it is targeted for deletion
+	if purge && delete {
+		fmt.Println("-", path)
+		os.Remove(path)
+	} else {
+		fmt.Println("~", path)
 	}
 
 	return nil

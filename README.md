@@ -1,5 +1,7 @@
 # DelADupe
 
+[![Build Status](https://travis-ci.org/mamoit/deladupe.svg?branch=master)](https://travis-ci.org/mamoit/deladupe)
+
 *THIS IS NOT PRODUCTION READY, DO NOT USE THIS!*
 
 ## Motivation

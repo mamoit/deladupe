@@ -129,7 +129,9 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 
 	// There's already a file with the same hash.
 	// Add this new one to the list
-	d.filesBySize[size].filesByHash[hash] = append(d.filesBySize[size].filesByHash[hash], ProcessedFile{purge, path})
+	d.filesBySize[size].filesByHash[hash] = append(
+		d.filesBySize[size].filesByHash[hash],
+		ProcessedFile{purge, path})
 
 	// Delete the new one if it is targeted for deletion
 	fmt.Println(deleteSymbol(purge), path)

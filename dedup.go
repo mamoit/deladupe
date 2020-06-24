@@ -50,6 +50,12 @@ func (d *Deduper) shouldVisit(info os.FileInfo) bool {
 	return true
 }
 
+func deleteSymbol(toDelete bool) string {
+	if !toDelete { return "+" }
+	if delete && toDelete { return "-" }
+	return "~"
+}
+
 func (d *Deduper) visitKeep(path string, info os.FileInfo, err error) error {
 	return d.visit(path, info, err, false)
 }
@@ -116,11 +122,9 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 
 	fmt.Println("#", size, hash)
 	for otherI := range d.filesBySize[size].filesByHash[hash] {
-		op := "+"
-		if d.filesBySize[size].filesByHash[hash][otherI].delete {
-			op = "-"
-		}
-		fmt.Println(op, d.filesBySize[size].filesByHash[hash][otherI].path)
+		fmt.Println(
+			deleteSymbol(d.filesBySize[size].filesByHash[hash][otherI].delete),
+			d.filesBySize[size].filesByHash[hash][otherI].path)
 	}
 
 	// There's already a file with the same hash.
@@ -128,13 +132,9 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 	d.filesBySize[size].filesByHash[hash] = append(d.filesBySize[size].filesByHash[hash], ProcessedFile{purge, path})
 
 	// Delete the new one if it is targeted for deletion
-	if purge {
-		fmt.Println("-", path)
-		if delete {
-			os.Remove(path)
-		}
-	} else {
-		fmt.Println("+", path)
+	fmt.Println(deleteSymbol(purge), path)
+	if purge && delete {
+		os.Remove(path)
 	}
 
 	return nil

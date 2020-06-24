@@ -1,7 +1,7 @@
 build:
 	go build
 
-release: build
+release:
 	go build -ldflags="-s -w"
 	upx deladupe
 

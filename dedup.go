@@ -18,7 +18,12 @@ type SameSized struct {
 
 	pending string
 
-	filesByHash map[string][]string
+	filesByHash map[string][]ProcessedFile
+}
+
+type ProcessedFile struct {
+	delete bool
+	path string
 }
 
 // Constructor for Deduper
@@ -72,7 +77,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 		// Add path to the pending slot and carry on
 		d.filesBySize[size] = &SameSized{
 			pending:     path,
-			filesByHash: make(map[string][]string),
+			filesByHash: make(map[string][]ProcessedFile),
 		}
 		d.mux.Unlock()
 		return nil
@@ -91,7 +96,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 
 		// if there is a pending hash, there must not be other
 		// files with the same size yet
-		d.filesBySize[size].filesByHash[hash] = []string{d.filesBySize[size].pending}
+		d.filesBySize[size].filesByHash[hash] = []ProcessedFile{{false, d.filesBySize[size].pending}}
 		d.filesBySize[size].pending = ""
 	}
 
@@ -105,25 +110,31 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 	_, ok = d.filesBySize[size].filesByHash[hash]
 	if !ok {
 		// there is no such hash yet, add it and carry on
-		d.filesBySize[size].filesByHash[hash] = []string{path}
+		d.filesBySize[size].filesByHash[hash] = []ProcessedFile{{false, path}}
 		return nil
 	}
 
 	fmt.Println("#", size, hash)
 	for otherI := range d.filesBySize[size].filesByHash[hash] {
-		fmt.Println("+", d.filesBySize[size].filesByHash[hash][otherI])
+		op := "+"
+		if d.filesBySize[size].filesByHash[hash][otherI].delete {
+			op = "-"
+		}
+		fmt.Println(op, d.filesBySize[size].filesByHash[hash][otherI].path)
 	}
 
 	// There's already a file with the same hash.
 	// Add this new one to the list
-	d.filesBySize[size].filesByHash[hash] = append(d.filesBySize[size].filesByHash[hash], path)
+	d.filesBySize[size].filesByHash[hash] = append(d.filesBySize[size].filesByHash[hash], ProcessedFile{purge, path})
 
 	// Delete the new one if it is targeted for deletion
-	if purge && delete {
+	if purge {
 		fmt.Println("-", path)
-		os.Remove(path)
+		if delete {
+			os.Remove(path)
+		}
 	} else {
-		fmt.Println("~", path)
+		fmt.Println("+", path)
 	}
 
 	return nil

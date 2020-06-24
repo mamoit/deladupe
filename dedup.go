@@ -92,7 +92,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 		// if there is a pending hash, there must not be other
 		// files with the same size yet
 		d.filesBySize[size].pending = ""
-		d.filesBySize[size].filesByHash[hash] = []string{hash}
+		d.filesBySize[size].filesByHash[hash] = []string{path}
 	}
 
 	// calculate sha256
@@ -105,7 +105,7 @@ func (d *Deduper) visit(path string, info os.FileInfo, err error, purge bool) er
 	_, ok = d.filesBySize[size].filesByHash[hash]
 	if !ok {
 		// there is no such hash yet, add it and carry on
-		d.filesBySize[size].filesByHash[hash] = []string{hash}
+		d.filesBySize[size].filesByHash[hash] = []string{path}
 		return nil
 	}
 

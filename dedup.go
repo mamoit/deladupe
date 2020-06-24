@@ -23,7 +23,7 @@ type SameSized struct {
 
 type ProcessedFile struct {
 	delete bool
-	path string
+	path   string
 }
 
 // Constructor for Deduper
@@ -51,8 +51,12 @@ func (d *Deduper) shouldVisit(info os.FileInfo) bool {
 }
 
 func deleteSymbol(toDelete bool) string {
-	if !toDelete { return "+" }
-	if delete && toDelete { return "-" }
+	if !toDelete {
+		return "+"
+	}
+	if delete && toDelete {
+		return "-"
+	}
 	return "~"
 }
 

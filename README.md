@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.org/mamoit/deladupe.svg?branch=master)](https://travis-ci.org/mamoit/deladupe)
 
-*THIS IS NOT PRODUCTION READY, DO NOT USE THIS!*
-
 ## Motivation
 I have a folder where I've thrown stuff into for a looooong time.
 It's full of cruft and duplicated data.
@@ -25,19 +23,6 @@ If a file exists multiple times, but only inside *keep* folders, all its instanc
 If a file exists multiple times, but only inside *purge* folders, all instances will be deleted but one (Ordering has not been considered as of the time of writing, so which one is kept should be considered random).
 
 If a file exists multiple times in both *keep* and *purge* folders, then all the ones in *keep* will be kept, and all the ones in *purge* will be... well... purged.
-
-## Data structure
-```
-Deduper
-- lock
-- filesBySize:
-  123:
-  - lock
-  - pending
-  - filesByHash:
-    0123456789abcdef:
-    - path
-```
 
 ## Questions
 
